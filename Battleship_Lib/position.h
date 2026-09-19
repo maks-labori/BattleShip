@@ -7,7 +7,7 @@ private:
 	int y;
 	char value; // '*' 'X' '1'
 public:
-	Position(int _x = 1, int _y = 1, char _value = '*');
+	Position(int _x, int _y, char _value = '*');
 	~Position() = default;
 	inline int get_x() const noexcept {
 		return x;
@@ -19,7 +19,7 @@ public:
 		return value;
 	}
 	inline void set_value(char _value) {
-		if ((_value == '*') or (_value == 'X') or (_value == '1')) { value = _value; }
+		if ((_value == '*') || (_value == 'X') || (_value == '1')) { value = _value; }
 		else { throw std::logic_error("No way value"); }
 	}
 };
