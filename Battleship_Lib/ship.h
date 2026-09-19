@@ -12,15 +12,10 @@ public:
 	inline int get_len()const noexcept {
 		return len;
 	}
-	inline bool islife()const noexcept{
-		return life;
-	}
 	inline const std::vector<Position>* const get_palubs()const noexcept {
 		return &palubs;
 	}
 	void break_palub(int index);
-	inline void die()noexcept {
-		life = false;
-	}
+	bool isdie()const noexcept;
 };
 

@@ -124,9 +124,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="position.cpp" />
+    <ClCompile Include="ship.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="position.h" />
+    <ClInclude Include="ship.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

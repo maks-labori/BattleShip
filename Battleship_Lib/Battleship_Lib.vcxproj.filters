@@ -18,9 +18,15 @@
     <ClCompile Include="position.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="ship.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="position.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ship.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
