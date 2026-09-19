@@ -7,6 +7,7 @@ private:
 	int y;
 	char value; // '*' 'X' '1'
 public:
+	Position() = default;
 	Position(int _x, int _y, char _value = '*');
 	~Position() = default;
 	inline int get_x() const noexcept {

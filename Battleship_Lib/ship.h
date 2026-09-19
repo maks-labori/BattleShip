@@ -15,6 +15,7 @@ public:
 	inline const std::vector<Position>* const get_palubs()const noexcept {
 		return &palubs;
 	}
+	bool checkshot(int _x, int _y);
 	void break_palub(int index);
 	bool isdie()const noexcept;
 };

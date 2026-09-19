@@ -34,3 +34,13 @@ bool Ship::isdie()const noexcept {
 	}
 	return true;
 }
+
+bool Ship::checkshot(int _x, int _y) {
+	for (int i = 0;i < len;++i) {
+		if (palubs[i].get_x() == _x && palubs[i].get_y() == _y) {
+			if (palubs[i].get_value() == '1') { break_palub(i); }
+			return true;
+		}
+	}
+	return false;
+}
