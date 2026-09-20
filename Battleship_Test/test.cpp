@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "position.h"
 #include "ship.h"
+#include "gamefield.h"
 
 
 TEST(TestPosition, TestConstuctor) {
@@ -93,3 +94,78 @@ TEST(TestShip, TestBreakPalub) {
 
 	EXPECT_TRUE(sh1.isdie());
 }
+TEST(TestShip, TestCheckshot) {
+	Position p1(1, 1, '1');
+	Position p2(1, 2, '1');
+	Position p3(1, 3, '1');
+
+	std::vector<Position> v = { p1,p2,p3 };
+
+	Ship sh1(3, v);
+	EXPECT_EQ(sh1.get_palubs()->operator[](0).get_value(), '1');
+	EXPECT_TRUE(sh1.checkshot(1, 1));
+	EXPECT_FALSE(sh1.checkshot(2, 2));
+	EXPECT_EQ(sh1.get_palubs()->operator[](0).get_value(), 'X');
+}
+//------gamefield
+
+TEST(TestGamefield,TestConstructor) {
+	Gamefield board;
+	for (int i = 0;i < 10;++i) {
+		for (int j = 0;j < 10;++j) {
+			EXPECT_EQ(board.get_pole(j+1,i+1).get_value(), '*');
+		}
+	}
+}
+TEST(TestGamefield, TestAddship) {
+	Gamefield board;
+	
+	Position p1(2, 2, '1');
+	Position p2(1, 2, '1');
+	Position p3(3, 2, '1');
+
+	std::vector<Position> v = { p1,p2,p3 };
+
+	Ship sh1(3, v);
+	EXPECT_EQ(board.get_pole(1, 2).get_value(), '*');
+	EXPECT_EQ(board.get_pole(2, 2).get_value(), '*');
+	EXPECT_EQ(board.get_pole(3, 2).get_value(), '*');
+	board.addship(sh1);
+	EXPECT_EQ(board.get_pole(1, 2).get_value(), '1');
+	EXPECT_EQ(board.get_pole(2, 2).get_value(), '1');
+	EXPECT_EQ(board.get_pole(3, 2).get_value(), '1');
+	
+	Position p4(6, 2, '1');
+	Position p5(5, 2, '1');
+	Position p6(4, 2, '1');
+
+	std::vector<Position> v2 = { p4,p5,p6 };
+
+	Ship sh2(3, v2);
+	EXPECT_FALSE(board.addship(sh2));
+	EXPECT_EQ(board.get_pole(4, 2).get_value(), '*');
+	EXPECT_EQ(board.get_pole(5, 2).get_value(), '*');
+	EXPECT_EQ(board.get_pole(6, 2).get_value(), '*');
+}
+TEST(TestGamefield, TestAttacked) {
+	Gamefield board;
+
+	Position p1(5, 6, '1');
+	Position p2(6, 6, '1');
+	Position p3(7, 6, '1');
+	Position p4(8, 6, '1');
+
+
+	std::vector<Position> v = { p1,p2,p3,p4 };
+
+	Ship sh1(4, v);
+	board.addship(sh1);
+	EXPECT_EQ(board.get_pole(6, 6).get_value(), '1');
+	EXPECT_TRUE(board.attacked(6, 6));
+	EXPECT_EQ(board.get_pole(6, 6).get_value(), 'X');
+	EXPECT_FALSE(board.attacked(6, 6));
+	EXPECT_EQ(board.get_pole(6, 6).get_value(), 'X');
+	EXPECT_FALSE(board.attacked(8, 8));
+	EXPECT_EQ(board.get_pole(8, 8).get_value(), '*');
+}
+

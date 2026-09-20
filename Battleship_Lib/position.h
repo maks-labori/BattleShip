@@ -6,6 +6,7 @@ private:
 	int x;
 	int y;
 	char value; // '*' 'X' '1'
+	bool mode;
 public:
 	Position() = default;
 	Position(int _x, int _y, char _value = '*');
@@ -16,11 +17,17 @@ public:
 	inline int get_y() const noexcept {
 		return y;
 	}
-	inline int get_value() const noexcept {
+	inline char get_value() const noexcept {
 		return value;
 	}
 	inline void set_value(char _value) {
 		if ((_value == '*') || (_value == 'X') || (_value == '1')) { value = _value; }
 		else { throw std::logic_error("No way value"); }
+	}
+	inline bool isopen()const noexcept {
+		return mode;
+	}
+	inline void open() {
+		mode = true;
 	}
 };

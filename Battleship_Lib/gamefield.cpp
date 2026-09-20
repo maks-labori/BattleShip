@@ -57,15 +57,30 @@ void Gamefield::print_field(bool show) {
 	for (int i = 0;i < FIELD_SIZE;++i) {
 		std::cout << std::setw(2) << (i + 1) << "| ";
 		for (int j = 0;j < FIELD_SIZE;++j) {
-			if (show) {
+			if (show || field[i][j].isopen()) {
 				std::cout << (char)field[i][j].get_value() << " ";
 			}
 			else {
-				std::cout << "~";
+				std::cout << "~ ";
 			}
 		}
 		std::cout << "|\n";
 	}
 	std::cout << "  +---------------------+\n";
 
+}
+bool Gamefield::attacked(int _x, int _y) {
+	if (_x > FIELD_SIZE || _y > FIELD_SIZE) { throw std::logic_error("out of range"); }
+	if (_x <= 0 || _y <= 0) { throw std::logic_error("index <= 0"); }
+	field[_y - 1][_x - 1].open();
+	if (field[_y - 1][_x - 1].get_value() == '1') {
+		field[_y - 1][_x - 1].set_value('X');
+		for (int i = 0;i < ships.size();++i) {
+			if (ships[i].checkshot(_x, _y)) {
+				break;
+			}
+		}
+		return true;
+	}
+	return false;
 }

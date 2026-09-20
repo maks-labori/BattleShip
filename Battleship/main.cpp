@@ -18,6 +18,8 @@ int main() {
 	Gamefield field;
 	field.addship(sh1);
 	field.addship(sh2);
-	field.print_field(true);
+	field.attacked(1, 1);
+	field.attacked(10, 10);
+	field.print_field(false);
 	return 0;
 }
