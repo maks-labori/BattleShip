@@ -11,7 +11,7 @@ Gamefield::~Gamefield() {
 	ships.clear();
 	ships.shrink_to_fit();
 }
-bool Gamefield::addship(const Ship& ship) {
+bool Gamefield::addship(const Ship& ship)noexcept {
 	bool flag = true;
 	if (ships.empty()) {
 		ships.push_back(ship);
@@ -27,8 +27,8 @@ bool Gamefield::addship(const Ship& ship) {
 		int new_y = ship.get_palubs()->operator[](i).get_y() - 1;
 		for (int j = 0;j < ships.size();++j) {
 			for (int z = 0;z < ships[j].get_len();++z) {
-				int old_x = ships[j].get_palubs()->operator[](i).get_x() - 1;
-				int old_y = ships[j].get_palubs()->operator[](i).get_y() - 1;
+				int old_x = ships[j].get_palubs()->operator[](z).get_x() - 1;
+				int old_y = ships[j].get_palubs()->operator[](z).get_y() - 1;
 
 				if (abs(new_x - old_x) <= 1 && abs(new_y - old_y) <= 1) {
 					flag = false;
@@ -51,7 +51,7 @@ bool Gamefield::addship(const Ship& ship) {
 	}
 	return false;
 }
-void Gamefield::print_field(bool show) {
+void Gamefield::print_field(bool show)noexcept {
 	std::cout << "    A B C D E F G H I J\n";
 	std::cout << "  +---------------------+\n";
 	for (int i = 0;i < FIELD_SIZE;++i) {
@@ -70,8 +70,6 @@ void Gamefield::print_field(bool show) {
 
 }
 bool Gamefield::attacked(int _x, int _y) {
-	if (_x > FIELD_SIZE || _y > FIELD_SIZE) { throw std::logic_error("out of range"); }
-	if (_x <= 0 || _y <= 0) { throw std::logic_error("index <= 0"); }
 	field[_y - 1][_x - 1].open();
 	if (field[_y - 1][_x - 1].get_value() == '1') {
 		field[_y - 1][_x - 1].set_value('X');
@@ -83,4 +81,35 @@ bool Gamefield::attacked(int _x, int _y) {
 		return true;
 	}
 	return false;
+}
+
+int Gamefield::ships_now()const noexcept{
+	int total = ships.size();
+	for (int i = 0;i < ships.size();++i) {
+		if (ships[i].isdie()) { total--; }
+	}
+	return total;
+}
+void Gamefield::after_die_ship(Ship& ship)noexcept {
+	for (int i = 0; i < ship.get_len();++i) {
+		int x = ship.get_palubs()->operator[](i).get_x();
+		int y = ship.get_palubs()->operator[](i).get_y();
+		for (int z = y - 1;z < y + 1;++z) {
+			for (int j = x - 1;i < x + 1;++j) {
+				if (z <= 0 || j <= 0 || z > 10 || j > 10) { continue; }
+				if (field[z - 1][j - 1].get_value() == 'X') { continue; }
+				field[z - 1][j - 1].open();
+				field[z - 1][j - 1].set_value('X');
+			}
+		}
+	}
+}
+
+void Gamefield::check_ships() {
+	for (int i = 0;i < ships.size();++i) {
+		if (ships[i].isdie()) {
+			ships[i].die();
+			after_die_ship(ships[i]);
+		}
+	}
 }
