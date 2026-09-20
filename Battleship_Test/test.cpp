@@ -2,7 +2,7 @@
 #include "position.h"
 #include "ship.h"
 #include "gamefield.h"
-
+#include "player.h"
 
 TEST(TestPosition, TestConstuctor) {
 	Position p1(6, 9, 'X');
@@ -168,4 +168,103 @@ TEST(TestGamefield, TestAttacked) {
 	EXPECT_FALSE(board.attacked(8, 8));
 	EXPECT_EQ(board.get_pole(8, 8).get_value(), '*');
 }
+TEST(TestGamefield, TestShipsnow) {
+	Gamefield board;
 
+	Position p1(5, 6, '1');
+	Position p2(6, 6, '1');
+	Position p3(7, 6, '1');
+	std::vector<Position> v = { p1,p2,p3 };
+	
+	Position r1(1, 4, '1');
+	Position r2(1, 5, '1');
+	Position r3(1, 6, '1');
+	std::vector<Position> v2 = { r1,r2,r3 };
+
+	Position s1(3, 3, '1');
+	Position s2(3, 2, '1');
+	Position s3(3, 1, '1');
+	std::vector<Position> v3 = { s1,s2,s3 };
+
+	Ship sh1(3, v);
+	Ship sh2(3, v2);
+	Ship sh3(3, v3);
+
+	EXPECT_EQ(board.ships_now(), 0);
+	board.addship(sh1);
+	EXPECT_EQ(board.ships_now(),1);
+	board.addship(sh2);
+	EXPECT_EQ(board.ships_now(), 2);
+	board.addship(sh3);
+	EXPECT_EQ(board.ships_now(), 3);
+}
+TEST(TestPlayer,TestConstructor ) {
+	Gamefield board1;
+	Gamefield board2;
+	EXPECT_NO_THROW(Player player1(board1, board2, 0));
+	EXPECT_NO_THROW(Player player2(board1, board2, 1));
+}
+
+TEST(TestPlayer, TestHumanmove) {
+	Gamefield board1;
+	Gamefield board2;
+	Player player1(board1, board2, 0);
+	Player player2(board2, board1, 0);
+
+	Position p1(5, 6, '1');
+	Position p2(6, 6, '1');
+	Position p3(7, 6, '1');
+	std::vector<Position> v = { p1,p2,p3 };
+	Ship sh1(3, v);
+	board1.addship(sh1);
+
+	EXPECT_EQ(board2.get_pole(5,6).get_value(),'*');
+	EXPECT_EQ(player1.human_move(5, 6), 1);
+	EXPECT_EQ(board1.get_pole(6, 6).get_value(), '1');
+	EXPECT_EQ(player2.human_move(6, 6), 2);
+	EXPECT_EQ(board1.get_pole(6, 6).get_value(), 'X');
+	EXPECT_EQ(player1.human_move(5, 6), 0);
+}
+
+TEST(TestPlayer, TestBotmove) {
+	Gamefield board1;
+	Gamefield board2;
+	Player bot(board1, board2, 1);
+	std::vector<Position> bot_moves;
+	for (int y = 1; y <= 10; ++y) {
+		for (int x = 1; x <= 10; ++x) {
+			if (x == 5 && y == 5) continue;
+			board2.attacked(x, y);
+		}
+	}
+
+	bot.bot_move(bot_moves);
+
+	EXPECT_FALSE(bot_moves.empty());
+	EXPECT_EQ(bot_moves.back().get_x(), 5);
+	EXPECT_EQ(bot_moves.back().get_y(), 5);
+	EXPECT_TRUE(board2.get_pole(5, 5).isopen());
+
+	
+	Gamefield board3;
+	Gamefield board4;
+	Player bot2(board3, board4, 1);
+	std::vector<Position> bot_moves2;
+
+	Position p1(1, 1, '1');
+	Position p2(2, 1, '1');
+	Position p3(3, 1, '1');
+	std::vector<Position> v = { p1,p2,p3 };
+	Ship sh1(3, v);
+	board4.addship(sh1);
+
+	board4.attacked(1, 2);
+
+	Position move(1, 1, '1');
+	bot_moves2.push_back(move);
+
+	bot2.bot_move(bot_moves2);
+	EXPECT_EQ(bot_moves2.back().get_x(), 2);
+	EXPECT_EQ(bot_moves2.back().get_y(), 1);
+	EXPECT_TRUE(board4.get_pole(2, 1).isopen());
+}

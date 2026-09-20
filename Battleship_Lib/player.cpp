@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player(const Gamefield& _my_board, const Gamefield& _other_board, bool _mode):my_board(_my_board),other_board(_other_board),mode(_mode) {}
+Player::Player(Gamefield& _my_board,Gamefield& _other_board, bool _mode):my_board(_my_board),other_board(_other_board),mode(_mode) {}
 
 int Player::human_move(int x, int y){
 	if (x > 10 || y > 10) { throw std::logic_error("out of range"); }

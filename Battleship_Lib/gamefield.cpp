@@ -95,7 +95,7 @@ void Gamefield::after_die_ship(Ship& ship)noexcept {
 		int x = ship.get_palubs()->operator[](i).get_x();
 		int y = ship.get_palubs()->operator[](i).get_y();
 		for (int z = y - 1;z < y + 1;++z) {
-			for (int j = x - 1;i < x + 1;++j) {
+			for (int j = x - 1;j < x + 1;++j) {
 				if (z <= 0 || j <= 0 || z > 10 || j > 10) { continue; }
 				if (field[z - 1][j - 1].get_value() == 'X') { continue; }
 				field[z - 1][j - 1].open();
