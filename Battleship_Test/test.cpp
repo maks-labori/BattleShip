@@ -3,7 +3,9 @@
 #include "ship.h"
 #include "gamefield.h"
 #include "player.h"
-
+#include "game.h"
+#include <gtest/gtest.h>
+#include <fstream>
 TEST(TestPosition, TestConstuctor) {
 	Position p1(6, 9, 'X');
 	EXPECT_EQ(p1.get_x(), 6);
@@ -219,11 +221,11 @@ TEST(TestPlayer, TestHumanmove) {
 	board1.addship(sh1);
 
 	EXPECT_EQ(board2.get_pole(5,6).get_value(),'*');
-	EXPECT_EQ(player1.human_move(5, 6), 1);
-	EXPECT_EQ(board1.get_pole(6, 6).get_value(), '1');
-	EXPECT_EQ(player2.human_move(6, 6), 2);
-	EXPECT_EQ(board1.get_pole(6, 6).get_value(), 'X');
 	EXPECT_EQ(player1.human_move(5, 6), 0);
+	EXPECT_EQ(board1.get_pole(6, 6).get_value(), '1');
+	EXPECT_EQ(player2.human_move(6, 6), 1);
+	EXPECT_EQ(board1.get_pole(6, 6).get_value(), 'X');
+	EXPECT_EQ(player1.human_move(5, 6), 2);
 }
 
 TEST(TestPlayer, TestBotmove) {
@@ -267,4 +269,116 @@ TEST(TestPlayer, TestBotmove) {
 	EXPECT_EQ(bot_moves2.back().get_x(), 2);
 	EXPECT_EQ(bot_moves2.back().get_y(), 1);
 	EXPECT_TRUE(board4.get_pole(2, 1).isopen());
+}
+//----game
+
+class GameTest : public ::testing::Test {
+protected:
+	Game game;
+};
+
+TEST_F(GameTest, TestInputhuman) {
+	std::stringstream input("1\n");
+	std::stringstream output;
+
+	bool mode = game.input_mode(input, output);
+
+	EXPECT_TRUE(mode);
+	EXPECT_EQ(output.str().c_str(), "Choice mode (0 - comp,1 - human):");
+}
+
+TEST_F(GameTest, TestInputcomp) {
+	std::stringstream input("0\n");
+	std::stringstream output;
+
+	bool mode = game.input_mode(input, output);
+
+	EXPECT_FALSE(mode);
+	EXPECT_EQ(output.str().c_str(), "Choice mode (0 - comp,1 - human):");
+}
+
+TEST_F(GameTest, Testthrowinput) {
+	std::stringstream input("abc\n5\n1\n");
+	std::stringstream output;
+
+	bool mode = game.input_mode(input, output);
+
+	EXPECT_TRUE(mode);
+	EXPECT_EQ(output.str().c_str(),"incorrect input");
+}
+TEST_F(GameTest, Testinputcord) {
+	std::stringstream input("A 1\n");
+	std::stringstream output;
+
+	std::vector<int> coords = game.input_coords(input, output);
+
+	EXPECT_EQ(coords.size(), 2);
+	EXPECT_EQ(coords[0], 1); 
+	EXPECT_EQ(coords[1], 1); 
+}
+
+TEST_F(GameTest, Testthrowinputcord) {
+	std::stringstream input("Z 5\nB 3\n");
+	std::stringstream output;
+
+	std::vector<int> coords = game.input_coords(input, output);
+	EXPECT_EQ(output.str().c_str(),"Incorrect input (letter from A to J)");
+}
+
+TEST_F(GameTest, invalidinputcoords) {
+	std::stringstream input("C 15\nC 7\n");
+	std::stringstream output;
+
+	std::vector<int> coords = game.input_coords(input, output);
+	EXPECT_EQ(output.str().c_str(),"Incorrect input (y from 1 to 10)");
+}
+
+TEST_F(GameTest, invalidinputcoords2) {
+	std::stringstream input("A abc\nA 4\n");
+	std::stringstream output;
+
+	std::vector<int> coords = game.input_coords(input, output);
+	EXPECT_EQ(output.str().c_str(),"Incorrect input");
+}
+TEST_F(GameTest, Testcompinit) {
+	Gamefield b1, b2;
+	Player bot_player(b1, b2,0);
+	std::stringstream output;
+	std::stringstream input;
+	game.comp_init(bot_player, output,input);
+
+	EXPECT_EQ(output.str().c_str(),"computer choices ships");
+	EXPECT_EQ(output.str().c_str(),"computer finish choice ships");
+
+}
+
+TEST_F(GameTest, Testhumaninit) {
+	Gamefield b1, b2;
+	Player human_player(b1, b2, true);
+	std::stringstream output;
+	std::stringstream input(
+		"A 1 H\n"  
+		"A 2 H\n"  
+		"A 3 H\n"  
+		"A 4 H\n"  
+		"A 5 H\n"  
+		"A 6 H\n"  
+		"A 7 H\n" 
+		"A 8 H\n"  
+		"A 9 H\n"  
+		"A 10 H\n" 
+	);
+	game.human_init(human_player, input, output);
+
+	EXPECT_EQ(output.str().c_str(), "Input ship(len = 4)");
+}
+
+TEST_F(GameTest, Testhrowhumaninit) {
+	Gamefield b1, b2;
+	Player human_player(b1, b2, true);
+	std::stringstream output;
+	std::stringstream input("J 10 H\nA 1 H\n");
+	game.human_init(human_player, input, output);
+	
+	EXPECT_EQ(output.str().c_str(), "Out behaind of border field");
 }
