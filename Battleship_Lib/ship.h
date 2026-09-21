@@ -1,0 +1,25 @@
+#pragma once
+#include "position.h"
+#include <vector>
+class Ship {
+private:
+	int len;
+	std::vector<Position> palubs;
+	bool life;
+public:
+	Ship(int _len, std::vector<Position>& _palubs);
+	~Ship() = default;
+	inline int get_len()const noexcept {
+		return len;
+	}
+	inline const std::vector<Position>* const get_palubs()const noexcept {
+		return &palubs;
+	}
+	inline void die() noexcept{
+		life = false;
+	}
+	bool checkshot(int _x, int _y);
+	void break_palub(int index);
+	bool isdie()const noexcept;
+};
+
