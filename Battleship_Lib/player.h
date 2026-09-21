@@ -12,6 +12,14 @@ public:
 	inline bool addship_board(const Ship& ship)noexcept {
 		return (my_board.addship(ship));
 	}
+	inline bool get_mode() {
+		return mode;
+	}
+	inline void print_board(bool show) {
+		my_board.print_field(show);
+	}
 	int human_move(int x, int y);
-	void bot_move(std::vector<Position>& moves);
+	bool bot_move(std::vector<Position>& moves);
+	void clear_board();
+	bool islose();
 };

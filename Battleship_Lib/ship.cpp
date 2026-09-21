@@ -17,11 +17,6 @@ Ship::Ship(int _len, std::vector<Position>& _palubs){
 	palubs = _palubs;
 }
 
-Ship::~Ship() {
-	palubs.clear();
-	palubs.shrink_to_fit();
-}
-
 void Ship::break_palub(int index){
 	if (index < 0) { throw std::logic_error("index from 0"); }
 	if (index >= palubs.size()) { throw std::logic_error("beyond the limits arr"); }

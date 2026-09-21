@@ -10,7 +10,7 @@ private:
 	Position field[FIELD_SIZE][FIELD_SIZE];
 public:
 	Gamefield();
-	~Gamefield();
+	~Gamefield() = default;
 	inline const std::vector<Ship>* const get_ships() const noexcept {
 		return &ships;
 	}
@@ -20,7 +20,7 @@ public:
 		return (field[_y-1][_x-1]);
 	}
 	void print_field(bool show)noexcept;
-	bool addship(const Ship& ship)noexcept;
+	bool addship(const Ship& ship);
 	bool attacked(int _x, int _y);
 	int ships_now()const noexcept;
 	void after_die_ship(Ship& ship)noexcept;

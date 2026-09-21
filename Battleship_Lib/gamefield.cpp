@@ -7,11 +7,13 @@ Gamefield::Gamefield() {
 		}
 	}
 }
-Gamefield::~Gamefield() {
-	ships.clear();
-	ships.shrink_to_fit();
-}
-bool Gamefield::addship(const Ship& ship)noexcept {
+
+bool Gamefield::addship(const Ship& ship) {
+	for (int i = 0;i < ship.get_len();++i) {
+		int x1 = ship.get_palubs()->operator[](i).get_x();
+		int y1 = ship.get_palubs()->operator[](i).get_y();
+		if (x1 < 1 || x1 >10 || y1 < 1 || y1 > 10) { return false; }
+	}
 	bool flag = true;
 	if (ships.empty()) {
 		ships.push_back(ship);
@@ -75,6 +77,7 @@ bool Gamefield::attacked(int _x, int _y) {
 		field[_y - 1][_x - 1].set_value('X');
 		for (int i = 0;i < ships.size();++i) {
 			if (ships[i].checkshot(_x, _y)) {
+				check_ships();
 				break;
 			}
 		}
@@ -94,12 +97,12 @@ void Gamefield::after_die_ship(Ship& ship)noexcept {
 	for (int i = 0; i < ship.get_len();++i) {
 		int x = ship.get_palubs()->operator[](i).get_x();
 		int y = ship.get_palubs()->operator[](i).get_y();
-		for (int z = y - 1;z < y + 1;++z) {
-			for (int j = x - 1;j < x + 1;++j) {
+		for (int z = y - 1;z < y + 2;++z) {
+			for (int j = x - 1;j < x + 2;++j) {
 				if (z <= 0 || j <= 0 || z > 10 || j > 10) { continue; }
 				if (field[z - 1][j - 1].get_value() == 'X') { continue; }
 				field[z - 1][j - 1].open();
-				field[z - 1][j - 1].set_value('X');
+				field[z - 1][j - 1].set_value('*');
 			}
 		}
 	}

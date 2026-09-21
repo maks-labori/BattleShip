@@ -8,7 +8,7 @@ private:
 	bool life;
 public:
 	Ship(int _len, std::vector<Position>& _palubs);
-	~Ship();
+	~Ship() = default;
 	inline int get_len()const noexcept {
 		return len;
 	}
