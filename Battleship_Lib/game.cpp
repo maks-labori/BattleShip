@@ -1,15 +1,8 @@
 #include "game.h"
 
 Game::Game() {
-	bool mode = input_mode(std::cout,std::cin);
-	Player player1(board1, board2, 1);
-	Player player2(board2, board1, mode);
-	players.push_back(player1);
-	players.push_back(player2);
-	init_ships(players[0],std::cout , std::cin);
-	system("cls");
-	init_ships(players[1],std::cout,std::cin);
-	system("cls");
+	this->board1 = Gamefield();
+	this->board2 = Gamefield();
 }
 
 bool Game::input_mode(std::ostream& out, std::istream& in) {
@@ -30,18 +23,18 @@ bool Game::input_mode(std::ostream& out, std::istream& in) {
 	return mode;
 }
 
-void Game::init_ships(Player& _player, std::ostream& out, std::istream& in) {
-	if (_player.get_mode()) { human_init(_player,out,in); }
-	else { comp_init(_player,out,in); }
+void Game::init_ships(Gamefield& _board,Player& _player, std::ostream& out, std::istream& in) {
+	if (_player.get_mode()) { human_init(_board,out,in); }
+	else { comp_init(_board,out,in); }
 }
 
-void Game::human_init(Player& _player, std::ostream& out, std::istream& in) {
+void Game::human_init(Gamefield& board, std::ostream& out, std::istream& in) {
 	system("cls");
 	int i = 0;
 	int lens[10] = { 4,3,3,2,2,2,1,1,1,1 };
 	while (i < 10) {
 		system("cls");
-		_player.print_board(true);
+		board.print_field(true,out,in);
 		out << "\n\nInput ship (len = " << lens[i] << ") - (advices : A 10 H/V): ";
 		try {
 			std::string str_x, str_y, str_way;
@@ -64,8 +57,8 @@ void Game::human_init(Player& _player, std::ostream& out, std::istream& in) {
 				pos.push_back(Position(new_x, new_y, '1'));
 				if (new_x > 10 || new_y > 10) { throw std::logic_error("Out behaind of border field"); }
 			}
-			Ship ship(lens[i], pos);
-			if (_player.addship_board(ship)) { i++; }
+			Ship ship(pos);
+			if (board.addship(ship)) { i++; }
 		}
 		catch (std::exception& er) {
 			out << er.what();
@@ -73,7 +66,7 @@ void Game::human_init(Player& _player, std::ostream& out, std::istream& in) {
 	}
 }
 
-void Game::comp_init(Player& _player, std::ostream& out, std::istream& in) {
+void Game::comp_init(Gamefield& board, std::ostream& out, std::istream& in) {
 	system("cls");
 	out << "computer choices ships\n";
 	int lens[10] = { 4,3,3,2,2,2,1,1,1,1 };
@@ -94,25 +87,38 @@ void Game::comp_init(Player& _player, std::ostream& out, std::istream& in) {
 		}
 		if (out) {attempt++;}
 		else {
-			Ship ship(lens[i], pos);
-			if (_player.addship_board(ship)) {i++;continue;}else {attempt++;}
+			Ship ship(pos);
+			if (board.addship(ship)) {i++;continue;}else {attempt++;}
 		}
-		if (attempt > 300) {i = 0;_player.clear_board();attempt = 0;}
+		if (attempt > 300) {i = 0;board.clear_board();attempt = 0;}
 	}
 	out << "computer finish choice ships\n";
 }
 
 void Game::run(std::ostream& out, std::istream& in) {
+	bool mode = input_mode(out, in);
+	Player player1(true);
+	Player player2(mode); 
+	players.push_back(player1);
+	players.push_back(player2);
+
+	out << "Player 1 Ships\n";
+	init_ships(board1, players[0], out, in);
+
+	out << "Player 2 Ships\n";
+	init_ships(board2, players[1], out, in);
+
+	std::vector<Position> vec;
+
 	system("cls");
 	out << "Start Game\n";
-	std::vector<Position> vec;
-	while (!players[0].islose() && !players[1].islose()) {
+	while (!board1.islose() && !board2.islose()) {
 		system("cls");
 		if (players[1].get_mode() == 1) { system("pause");system("cls"); }
 		out << "First player move\n\n";
-		while (move(players[0], players[1], vec,out,in)) { 
+		while (move(players[0], board2, vec,out,in)) { 
 			system("cls");
-			if (players[1].islose()) {
+			if (board2.islose()) {
 				out << "First player won";
 				break;
 			}
@@ -120,9 +126,9 @@ void Game::run(std::ostream& out, std::istream& in) {
 		
 		if (players[1].get_mode() == 1) { system("pause");system("cls");}
 		out << "Second player move\n\n";
-		while (move(players[1], players[0], vec,out,in)) { 
+		while (move(players[1], board1, vec,out,in)) { 
 			system("cls");
-			if (players[0].islose()) {
+			if (board1.islose()) {
 				out << "Second player won";
 				break;
 			}
@@ -130,21 +136,28 @@ void Game::run(std::ostream& out, std::istream& in) {
 	}
 }
 
-int Game::move(Player& player1,Player& player2,std::vector<Position> vec, std::ostream& out, std::istream& in) {
+int Game::move(Player& player,Gamefield& other_board ,std::vector<Position> vec, std::ostream& out, std::istream& in) {
 	int total;
-	if (player1.get_mode()) {
-		player1.print_board(true);
-		player2.print_board(false);
-		std::vector<int>coords = input_coords(out,in);
-		total = player1.human_move(coords[0], coords[1]);
+	if (player.get_mode()) {
+		bool boards = (&other_board == &board2);
+		if (boards) {
+			board1.print_field(true,out,in);
+			board2.print_field(false,out,in);
+		}
+		else {
+			board2.print_field(true,out,in);
+			board1.print_field(false,out,in);
+		}
+		Position pos = input_coords(out,in);
+		total = player.human_move(pos.get_x(), pos.get_y(),other_board);
 	}
 	else {
-		total = player1.bot_move(vec);
+		total = player.bot_move(vec,other_board);
 	}
 	return total;
 }
 
-std::vector<int> Game::input_coords(std::ostream& out, std::istream& in) {
+Position Game::input_coords(std::ostream& out, std::istream& in) {
 	std::string str_x;
 	std::string str_y;
 	while (1) {
@@ -161,7 +174,7 @@ std::vector<int> Game::input_coords(std::ostream& out, std::istream& in) {
 			if (y < 1 || y > 10) {
 				throw std::logic_error("y from 1 to 10");
 			}
-			return { x, y };
+			return Position(x,y);
 		}
 		catch (std::exception& er) {
 			out << "Incorrect input (" << er.what() << "), try again\n";

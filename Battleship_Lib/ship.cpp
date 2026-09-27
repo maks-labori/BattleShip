@@ -1,9 +1,7 @@
 #include "ship.h"
 
-Ship::Ship(int _len, std::vector<Position>& _palubs){
-	if (_len < 1 || _len > 4) { throw std::logic_error("len from 1 to 4"); }
-	if (_palubs.size() != _len) { throw std::logic_error("size != len"); }
-	len = _len;
+Ship::Ship(const std::vector<Position>& _palubs){
+	if (_palubs.size()< 1 || _palubs.size() > 4) { throw std::logic_error("len from 1 to 4"); }
 	life = true;
 	for (int i = 0;i < _palubs.size();++i) {
 		for (int j = 0;j < _palubs.size();++j) {
@@ -24,14 +22,14 @@ void Ship::break_palub(int index){
 }
 
 bool Ship::isdie()const noexcept {
-	for (int i = 0;i < len;++i) {
+	for (int i = 0;i < palubs.size();++i) {
 		if (palubs[i].get_value() == '1') { return false; }
 	}
 	return true;
 }
 
 bool Ship::checkshot(int _x, int _y) {
-	for (int i = 0;i < len;++i) {
+	for (int i = 0;i < palubs.size();++i) {
 		if (palubs[i].get_x() == _x && palubs[i].get_y() == _y) {
 			if (palubs[i].get_value() == '1') { break_palub(i); }
 			return true;

@@ -8,7 +8,6 @@ private:
 	char value; // '*' 'X' '1'
 	bool mode;
 public:
-	Position() = default;
 	Position(int _x, int _y, char _value = '*');
 	~Position() = default;
 	inline int get_x() const noexcept {
@@ -27,7 +26,7 @@ public:
 	inline bool isopen()const noexcept {
 		return mode;
 	}
-	inline void open() {
+	inline void open()noexcept {
 		mode = true;
 	}
 };

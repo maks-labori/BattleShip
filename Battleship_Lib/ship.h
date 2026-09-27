@@ -3,20 +3,21 @@
 #include <vector>
 class Ship {
 private:
-	int len;
 	std::vector<Position> palubs;
 	bool life;
 public:
-	Ship(int _len, std::vector<Position>& _palubs);
+	Ship(const std::vector<Position>& _palubs);
 	~Ship() = default;
-	inline int get_len()const noexcept {
-		return len;
-	}
-	inline const std::vector<Position>* const get_palubs()const noexcept {
-		return &palubs;
+	inline const std::vector<Position>& get_palubs()const noexcept {
+		return palubs;
 	}
 	inline void die() noexcept{
 		life = false;
+	}
+	inline void set_palubs(int index,char value) {
+		if (index >= 0 && index <= 4) {
+			palubs[index].set_value(value);
+		}
 	}
 	bool checkshot(int _x, int _y);
 	void break_palub(int index);

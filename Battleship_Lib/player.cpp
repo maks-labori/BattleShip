@@ -1,15 +1,16 @@
 #include "player.h"
 
-Player::Player(Gamefield& _my_board,Gamefield& _other_board, bool _mode):my_board(_my_board),other_board(_other_board),mode(_mode) {}
+Player::Player(bool _mode):mode(_mode) {}
 
-int Player::human_move(int x, int y){
+int Player::human_move(int x, int y, Gamefield& other_board){
 	if (x > 10 || y > 10) { throw std::logic_error("out of range"); }
 	if (x <= 0 || y <= 0) { throw std::logic_error("index <= 0"); }
-	if (other_board.get_pole(x, y).isopen()) { return 2; }
+	int index = (x - 1) * 10 + (y - 1);
+	if (other_board.get_pole()[index].isopen()) { return 2; }
 	if (other_board.attacked(x, y)) { return 1; }
 	return 0;
 }
-bool Player::bot_move(std::vector<Position>& moves) {
+bool Player::bot_move(std::vector<Position>& moves,Gamefield& other_board) {
 	int x = 0, y = 0;
 	if (!moves.empty() && moves.back().get_value() == '1') {
 		int old_x = moves.back().get_x();
@@ -23,7 +24,8 @@ bool Player::bot_move(std::vector<Position>& moves) {
 			int new_x = old_x + w.first;
 			int new_y = old_y + w.second;
 			if (new_x <= 10 && new_y <= 10 && new_x >= 1 && new_y >= 1) {
-				if (other_board.get_pole(new_x, new_y).isopen()) {
+				int new_index = (new_x - 1) * 10 + new_y - 1;
+				if (other_board.get_pole()[new_index].isopen()) {
 					continue;
 				}
 				x = new_x;
@@ -32,25 +34,20 @@ bool Player::bot_move(std::vector<Position>& moves) {
 			}
 		}
 	}
+	
 	if (x == 0 && y == 0) {
+		int target_index = (x - 1) * 10 + y - 1;
 		do {
 			x = rand() % 10 + 1;
 			y = rand() % 10 + 1;
-		} while (other_board.get_pole(x, y).isopen());
+			target_index = (x - 1) * 10 + y - 1;
+		} while (other_board.get_pole()[target_index].isopen());
 	}
-
-	char cell = other_board.get_pole(x, y).get_value();
+	int final_index = (x - 1) * 10 + y - 1;
+	char cell = other_board.get_pole()[final_index].get_value();
 
 	bool out = other_board.attacked(x, y);
 	moves.push_back(Position(x, y, cell));
 	return out;
 }
 
-void Player::clear_board() {
-	my_board = Gamefield();
-}
-
-bool Player::islose() {
-	int count = my_board.ships_now();
-	return (count == 0);
-}

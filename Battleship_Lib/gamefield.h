@@ -2,27 +2,27 @@
 #include "ship.h"
 #include <cmath>
 #include <iomanip>
+#include <sstream>
 
 class Gamefield {
 private:
-	static const int FIELD_SIZE = 10;
 	std::vector<Ship> ships;
-	Position field[FIELD_SIZE][FIELD_SIZE];
+	std::vector<Position> field;
 public:
 	Gamefield();
 	~Gamefield() = default;
-	inline const std::vector<Ship>* const get_ships() const noexcept {
-		return &ships;
+	inline const std::vector<Ship>& get_ships() const noexcept {
+		return ships;
 	}
-	inline const Position& get_pole(int _x, int _y) {
-		if (_x > FIELD_SIZE || _y > FIELD_SIZE) { throw std::logic_error("out of range"); }
-		if (_x <= 0 || _y <= 0) { throw std::logic_error("index <= 0"); }
-		return (field[_y-1][_x-1]);
+	inline const std::vector<Position>& get_pole() {
+		return field;
 	}
-	void print_field(bool show)noexcept;
-	bool addship(const Ship& ship);
+	void print_field(bool show,std::ostream& out,std::istream& in)const noexcept;
+	bool addship(const Ship& ship)noexcept;
 	bool attacked(int _x, int _y);
 	int ships_now()const noexcept;
 	void after_die_ship(Ship& ship)noexcept;
-	void check_ships();
+	void check_ships()noexcept;
+	void clear_board()noexcept;
+	bool islose()const;
 };
