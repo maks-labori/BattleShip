@@ -9,51 +9,38 @@ Gamefield::Gamefield() {
 }
 
 bool Gamefield::addship(const Ship& ship)noexcept {
-	int len = ship.get_palubs().size();
-	for (int i = 0;i < len;++i) {
-		int x1 = ship.get_palubs()[i].get_x();
-		int y1 = ship.get_palubs()[i].get_y();
-		if (x1 < 1 || x1 >10 || y1 < 1 || y1 > 10) { return false; }
-	}
-	bool flag = true;
-	if (ships.empty()) {
+	int len = ship.get_palubs().size(); //check coords in ship
+	if (!ship.is_valid()) { return false; }
+	if (ships.empty()) { //empty - true
 		ships.push_back(ship);
 		for (int i = 0; i < len; ++i) {
-			int x = ship.get_palubs()[i].get_x()-1;
-			int y = ship.get_palubs()[i].get_y()-1;
-			int index = x*10 + y;
+			int index = ship.get_palubs()[i].get_index();
 			field[index].set_value('1');
 		}
 		return true;
 	}
-	for (int i = 0;i < len;++i) {
-		int new_x = ship.get_palubs()[i].get_x() - 1;
-		int new_y = ship.get_palubs()[i].get_y() - 1;
-		for (int j = 0;j < ships.size();++j) {
-			for (int z = 0;z < len;++z) {
-				int old_x = ships[j].get_palubs()[i].get_x() - 1;
-				int old_y = ships[j].get_palubs()[i].get_y() - 1;
+	int count_ships = ships.size();
+	for (int i = 0;i < len;++i) { //near - false
+		int new_x = ship.get_palubs()[i].get_x();
+		int new_y = ship.get_palubs()[i].get_y();
+		for (int j = 0;j < count_ships;++j) {
+			int old_len = ships[j].get_palubs().size();
+			for (int z = 0;z < old_len;++z) {
+				int old_x = ships[j].get_palubs()[z].get_x();
+				int old_y = ships[j].get_palubs()[z].get_y();
 				if (abs(new_x - old_x) <= 1 && abs(new_y - old_y) <= 1) {
-					flag = false;
-					break;
+					return false;
 				}
 				
 			}
-			if (!flag) { break; }
 		}
-		if (!flag) { break; }
 	}
-	if (flag) {
-		ships.push_back(ship);
-		for (int i = 0; i < len; ++i) {
-			int x = ship.get_palubs()[i].get_x() - 1;
-			int y = ship.get_palubs()[i].get_y() - 1;
-			int index = x * 10 + y;
-			field[index].set_value('1');
-		}
-		return true;
+	ships.push_back(ship); //add ship and update field
+	for (int i = 0; i < len; ++i) {
+		int index = ship.get_palubs()[i].get_index();
+		field[index].set_value('1');
 	}
-	return false;
+	return true;
 }
 void Gamefield::print_field(bool show, std::ostream& out, std::istream& in)const noexcept {
 	out << "    A B C D E F G H I J\n";
@@ -61,8 +48,9 @@ void Gamefield::print_field(bool show, std::ostream& out, std::istream& in)const
 	for (int i = 0;i < 10;++i) {
 		out << std::setw(2) << (i + 1) << "| ";
 		for (int j = 0;j < 10;++j) {
-			if (show || field[i*10+j].isopen()) {
-				out << (char)field[i * 10 + j].get_value() << " ";
+			int index = j * 10 + i;
+			if (show || field[index].isopen()) {
+				out << (char)field[index].get_value() << " ";
 			}
 			else {
 				out << "~ ";
@@ -90,20 +78,22 @@ bool Gamefield::attacked(int _x, int _y) {
 }
 
 int Gamefield::ships_now()const noexcept{
-	int total = ships.size();
-	for (int i = 0;i < ships.size();++i) {
+	int count_ships = ships.size();
+	int total = count_ships;
+	for (int i = 0;i < count_ships;++i) {
 		if (ships[i].isdie()) { total--; }
 	}
 	return total;
 }
-void Gamefield::after_die_ship(Ship& ship)noexcept {
-	for (int i = 0; i < ship.get_palubs().size();++i) {
-		int x = ship.get_palubs()[i].get_x() - 1;
-		int y = ship.get_palubs()[i].get_y() - 1;
-		for (int z = y - 1;z < y + 2;++z) {
-			for (int j = x - 1;j < x + 2;++j) {
-				int index = (z - 1) * 10 + (j - 1);
-				if (z <= 0 || j <= 0 || z > 10 || j > 10) { continue; }
+void Gamefield::after_die_ship(const Ship& ship)noexcept {
+	int count_palubs = ship.get_palubs().size();
+	for (int i = 0; i < count_palubs;++i) {
+		int x = ship.get_palubs()[i].get_x();
+		int y = ship.get_palubs()[i].get_y();
+		for (int cur_y = y - 1;cur_y < y + 2;++cur_y) {
+			for (int cur_x= x - 1;cur_x < x + 2;++cur_x) {
+				if (cur_y < 1|| cur_x < 1 || cur_y > 10 ||cur_x > 10) { continue; }
+				int index = Position(cur_x, cur_y).get_index();
 				if (field[index].get_value() == 'X') { continue; }
 				field[index].open();
 				field[index].set_value('*');
@@ -113,7 +103,8 @@ void Gamefield::after_die_ship(Ship& ship)noexcept {
 }
 
 void Gamefield::check_ships()noexcept {
-	for (int i = 0;i < ships.size();++i) {
+	int count_ships = ships.size();
+	for (int i = 0;i < count_ships;++i) {
 		if (ships[i].isdie()) {
 			ships[i].die();
 			after_die_ship(ships[i]);
@@ -125,7 +116,7 @@ void Gamefield::clear_board()noexcept {
 	*this = Gamefield();
 }
 
-bool Gamefield::islose()const {
+bool Gamefield::islose()const noexcept {
 	int count = ships_now();
 	return (count == 0);
 }

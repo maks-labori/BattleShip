@@ -1,10 +1,5 @@
 #include "game.h"
 
-Game::Game() {
-	this->board1 = Gamefield();
-	this->board2 = Gamefield();
-}
-
 bool Game::input_mode(std::ostream& out, std::istream& in) {
 	std::string str;bool mode;
 	while (1) {
@@ -62,6 +57,7 @@ void Game::human_init(Gamefield& board, std::ostream& out, std::istream& in) {
 		}
 		catch (std::exception& er) {
 			out << er.what();
+			in.clear();
 		}
 	}
 }
@@ -120,7 +116,7 @@ void Game::run(std::ostream& out, std::istream& in) {
 			system("cls");
 			if (board2.islose()) {
 				out << "First player won";
-				break;
+				return;
 			}
 		};
 		
@@ -130,7 +126,7 @@ void Game::run(std::ostream& out, std::istream& in) {
 			system("cls");
 			if (board1.islose()) {
 				out << "Second player won";
-				break;
+				return;
 			}
 		};
 	}
@@ -139,15 +135,9 @@ void Game::run(std::ostream& out, std::istream& in) {
 int Game::move(Player& player,Gamefield& other_board ,std::vector<Position> vec, std::ostream& out, std::istream& in) {
 	int total;
 	if (player.get_mode()) {
-		bool boards = (&other_board == &board2);
-		if (boards) {
-			board1.print_field(true,out,in);
-			board2.print_field(false,out,in);
-		}
-		else {
-			board2.print_field(true,out,in);
-			board1.print_field(false,out,in);
-		}
+		Gamefield& my_board = (&other_board == &board1) ? board2 : board1;
+		my_board.print_field(true, out, in);
+		other_board.print_field(false, out, in);
 		Position pos = input_coords(out,in);
 		total = player.human_move(pos.get_x(), pos.get_y(),other_board);
 	}

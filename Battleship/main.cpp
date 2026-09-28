@@ -2,6 +2,6 @@
 
 int main() {
 	Game game;
-	game.run();
+	game.run(std::cout , std::cin);
 	return 0;
 }

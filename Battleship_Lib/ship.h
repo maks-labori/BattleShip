@@ -22,5 +22,6 @@ public:
 	bool checkshot(int _x, int _y);
 	void break_palub(int index);
 	bool isdie()const noexcept;
+	bool is_valid()const noexcept;
 };
 

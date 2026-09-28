@@ -37,3 +37,13 @@ bool Ship::checkshot(int _x, int _y) {
 	}
 	return false;
 }
+
+bool Ship::is_valid()const noexcept {
+	int len = palubs.size();
+	for (int i = 0;i < len;++i) {
+		int x = palubs[i].get_x();
+		int y = palubs[i].get_y();
+		if (x < 1 || y < 1 || x > 10 || y > 10) { return false; }
+	}
+	return true;
+}

@@ -29,4 +29,8 @@ public:
 	inline void open()noexcept {
 		mode = true;
 	}
+	inline int get_index()const noexcept {
+		int index = (x - 1) * 10 + (y - 1);
+		return index;
+	}
 };

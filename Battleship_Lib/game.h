@@ -7,7 +7,7 @@ private:
 	Gamefield board2;
 	std::vector<Player> players;
 public:
-	Game();
+	Game() = default;
 	~Game() = default;
 	bool input_mode(std::ostream& out, std::istream& in);
 	Position input_coords(std::ostream& out,std::istream& in);

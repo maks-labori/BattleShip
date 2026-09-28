@@ -21,8 +21,8 @@ public:
 	bool addship(const Ship& ship)noexcept;
 	bool attacked(int _x, int _y);
 	int ships_now()const noexcept;
-	void after_die_ship(Ship& ship)noexcept;
+	void after_die_ship(const Ship& ship)noexcept;
 	void check_ships()noexcept;
 	void clear_board()noexcept;
-	bool islose()const;
+	bool islose()const noexcept;
 };
