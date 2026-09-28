@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{12f6e57f-8d61-43a3-89bb-ee6de3b493e3}</ProjectGuid>
-    <RootNamespace>Battleship</RootNamespace>
+    <ProjectGuid>{2a709962-fe1b-4a04-be69-84b706e2b676}</ProjectGuid>
+    <RootNamespace>BattleshipLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -102,7 +102,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\maksi\source\repos\Battleship\Battleship_Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,12 +123,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gamefield.cpp" />
+    <ClCompile Include="player.cpp" />
+    <ClCompile Include="position.cpp" />
+    <ClCompile Include="ship.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Battleship_Lib\Battleship_Lib.vcxproj">
-      <Project>{2a709962-fe1b-4a04-be69-84b706e2b676}</Project>
-    </ProjectReference>
+    <ClInclude Include="game.h" />
+    <ClInclude Include="gamefield.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="position.h" />
+    <ClInclude Include="ship.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

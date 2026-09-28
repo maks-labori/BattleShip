@@ -1,0 +1,49 @@
+#include "ship.h"
+
+Ship::Ship(const std::vector<Position>& _palubs){
+	if (_palubs.size()< 1 || _palubs.size() > 4) { throw std::logic_error("len from 1 to 4"); }
+	life = true;
+	for (int i = 0;i < _palubs.size();++i) {
+		for (int j = 0;j < _palubs.size();++j) {
+			if (j == i) { continue; }
+			if (_palubs[i].get_x() != _palubs[j].get_x() && _palubs[i].get_y() != _palubs[j].get_y()) {
+				throw std::logic_error("No way such ship");
+			}
+			if (_palubs[i].get_value() != '1') { throw std::logic_error("not ship"); }
+		}
+	}
+	palubs = _palubs;
+}
+
+void Ship::break_palub(int index){
+	if (index < 0) { throw std::logic_error("index from 0"); }
+	if (index >= palubs.size()) { throw std::logic_error("beyond the limits arr"); }
+	palubs[index].set_value('X');
+}
+
+bool Ship::isdie()const noexcept {
+	for (int i = 0;i < palubs.size();++i) {
+		if (palubs[i].get_value() == '1') { return false; }
+	}
+	return true;
+}
+
+bool Ship::checkshot(int _x, int _y) {
+	for (int i = 0;i < palubs.size();++i) {
+		if (palubs[i].get_x() == _x && palubs[i].get_y() == _y) {
+			if (palubs[i].get_value() == '1') { break_palub(i); }
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ship::is_valid()const noexcept {
+	int len = palubs.size();
+	for (int i = 0;i < len;++i) {
+		int x = palubs[i].get_x();
+		int y = palubs[i].get_y();
+		if (x < 1 || y < 1 || x > 10 || y > 10) { return false; }
+	}
+	return true;
+}
